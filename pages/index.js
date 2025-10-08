@@ -14,11 +14,9 @@ const AmazonToolkitStore = () => {
   const [showSettings, setShowSettings] = useState(false);
   
   // Nom personnalisable du magasin
-  const [storeName, setStoreName] = useState(() => {
-    return localStorage.getItem('storeName') || 'Amazon Seller Toolkit';
-  });
+  const [storeName, setStoreName] = useState('Amazon Seller Toolkit');
   const [editingName, setEditingName] = useState(false);
-  const [tempName, setTempName] = useState(storeName);
+  const [tempName, setTempName] = useState('Amazon Seller Toolkit');
   
   // États pour chaque mode
   const [simpleApp, setSimpleApp] = useState({
@@ -47,6 +45,17 @@ const AmazonToolkitStore = () => {
     indigo: 'from-indigo-400 to-indigo-600',
     rose: 'from-rose-400 to-rose-600'
   };
+
+  // Charger le nom du magasin depuis localStorage UNIQUEMENT côté client
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedName = localStorage.getItem('storeName');
+      if (savedName) {
+        setStoreName(savedName);
+        setTempName(savedName);
+      }
+    }
+  }, []);
 
   const supabaseFetch = async (endpoint, options = {}) => {
     const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
@@ -271,7 +280,10 @@ const AmazonToolkitStore = () => {
 
   const saveStoreName = () => {
     setStoreName(tempName);
-    localStorage.setItem('storeName', tempName);
+    // Sauvegarder seulement côté client
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('storeName', tempName);
+    }
     setEditingName(false);
   };
 
@@ -464,7 +476,7 @@ const AmazonToolkitStore = () => {
               <p className="text-sm" style={{ color: '#6B7280' }}>Deploy Vercel</p>
             </button>
 
-            {/* Option 4 - NOUVELLE */}
+            {/* Option 4 */}
             <button
               onClick={() => { setShowAddModal(true); setAddMode('external'); }}
               style={{
@@ -488,7 +500,7 @@ const AmazonToolkitStore = () => {
                 marginBottom: '16px',
                 boxShadow: '0 8px 24px rgba(236, 72, 153, 0.3)'
               }}>
-                <LinkIcon className="w-7 h-7 text-white" />
+                <Globe className="w-7 h-7 text-white" />
               </div>
               <h3 className="text-lg font-bold mb-2" style={{ color: '#1F2937' }}>App Externe</h3>
               <p className="text-sm" style={{ color: '#6B7280' }}>URL Azure/Vercel</p>
