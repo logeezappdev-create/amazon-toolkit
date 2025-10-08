@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Plus, Upload, RefreshCw, Trash2, ExternalLink, Code, Package, Github, Globe, Settings, Edit2, Check, X } from 'lucide-react';
+import { ShoppingCart, Upload, RefreshCw, Trash2, Code, Package, Github, Globe, Settings, Edit2, Check, X } from 'lucide-react';
 
-// Configuration
 const SUPABASE_URL = 'https://jeqvjmzqcuklrjvglwrc.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplcXZqbXpxY3VrbHJqdmdsd3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NzU1NjEsImV4cCI6MjA3NTQ1MTU2MX0.HPBet3MeOla00wB4a5znjbX9PZecBwbDna0GfliisQY';
 const VERCEL_TOKEN = 'VOTRE_VERCEL_TOKEN';
@@ -11,14 +10,10 @@ const AmazonToolkitStore = () => {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [addMode, setAddMode] = useState(null);
-  const [showSettings, setShowSettings] = useState(false);
-  
-  // Nom personnalisable du magasin
   const [storeName, setStoreName] = useState('Amazon Seller Toolkit');
   const [editingName, setEditingName] = useState(false);
   const [tempName, setTempName] = useState('Amazon Seller Toolkit');
   
-  // États pour chaque mode
   const [simpleApp, setSimpleApp] = useState({
     name: '', description: '', icon: '📱', color: 'purple', htmlContent: ''
   });
@@ -45,10 +40,6 @@ const AmazonToolkitStore = () => {
     indigo: 'from-indigo-400 to-indigo-600',
     rose: 'from-rose-400 to-rose-600'
   };
-
-  useEffect(() => {
-    // Nom par défaut déjà initialisé
-  }, []);
 
   const supabaseFetch = async (endpoint, options = {}) => {
     const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
@@ -81,7 +72,7 @@ const AmazonToolkitStore = () => {
   }, []);
 
   const deleteApp = async (id) => {
-    if (!confirm('Supprimer cette app ?')) return;
+    if (!window.confirm('Supprimer cette app ?')) return;
     try {
       await supabaseFetch(`apps?id=eq.${id}`, { method: 'DELETE' });
       loadApps();
@@ -191,9 +182,10 @@ const AmazonToolkitStore = () => {
     }
     try {
       setGithubApp({...githubApp, deploying: true});
-      const match = githubApp.repoUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
-      if (!match) throw new Error('URL invalide');
-      const [, owner, repo] = match;
+      const repoMatch = githubApp.repoUrl.match(/github\.com[:/]([^/]+)[:/]([^/.]+)/);
+      if (!repoMatch) throw new Error('URL invalide');
+      const owner = repoMatch[1];
+      const repo = repoMatch[2];
       const vercelResponse = await fetch('https://api.vercel.com/v10/projects', {
         method: 'POST',
         headers: {
@@ -282,25 +274,12 @@ const AmazonToolkitStore = () => {
   };
 
   return (
-    <div className="min-h-screen" style={{
-      background: 'linear-gradient(135deg, #F3E8FF 0%, #DBEAFE 50%, #FCE7F3 100%)'
-    }}>
-      {/* Header Glassmorphism */}
-      <header style={{
-        background: 'rgba(255, 255, 255, 0.7)',
-        backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)'
-      }}>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+      <header className="bg-white bg-opacity-70 backdrop-blur-lg border-b border-white border-opacity-20 shadow-lg">
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div style={{
-                background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
-                borderRadius: '16px',
-                padding: '12px',
-                boxShadow: '0 8px 24px rgba(139, 92, 246, 0.3)'
-              }}>
+              <div className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl p-3 shadow-lg">
                 <ShoppingCart className="w-8 h-8 text-white" />
               </div>
               <div>
@@ -310,58 +289,32 @@ const AmazonToolkitStore = () => {
                       type="text"
                       value={tempName}
                       onChange={(e) => setTempName(e.target.value)}
-                      className="text-2xl font-bold px-3 py-1 rounded-lg border-2 border-purple-400"
-                      style={{ background: 'rgba(255,255,255,0.9)' }}
+                      className="text-2xl font-bold px-3 py-1 rounded-lg border-2 border-purple-400 bg-white bg-opacity-90"
                     />
-                    <button onClick={saveStoreName} className="p-2 bg-green-500 text-white rounded-lg">
+                    <button onClick={saveStoreName} className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
                       <Check className="w-5 h-5" />
                     </button>
-                    <button onClick={cancelEditName} className="p-2 bg-red-500 text-white rounded-lg">
+                    <button onClick={cancelEditName} className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                       <X className="w-5 h-5" />
                     </button>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <h1 className="text-2xl font-bold" style={{ color: '#7C3AED' }}>
-                      {storeName}
-                    </h1>
-                    <button 
-                      onClick={() => setEditingName(true)}
-                      className="p-1 hover:bg-purple-100 rounded-lg transition-all"
-                    >
+                    <h1 className="text-2xl font-bold text-purple-700">{storeName}</h1>
+                    <button onClick={() => setEditingName(true)} className="p-1 hover:bg-purple-100 rounded-lg transition-all">
                       <Edit2 className="w-5 h-5 text-purple-600" />
                     </button>
                   </div>
                 )}
-                <p className="text-sm" style={{ color: '#6B7280' }}>Magasin d'applications</p>
+                <p className="text-sm text-gray-600">Magasin d'applications</p>
               </div>
             </div>
             <div className="flex gap-3">
-              <button 
-                onClick={loadApps}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  backdropFilter: 'blur(8px)',
-                  borderRadius: '12px',
-                  padding: '12px',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
-                }}
-                className="hover:scale-105 transition-transform"
-              >
-                <RefreshCw className="w-5 h-5" style={{ color: '#8B5CF6' }} />
+              <button onClick={loadApps} className="bg-white bg-opacity-90 backdrop-blur-lg rounded-xl p-3 shadow-md hover:scale-105 transition-transform">
+                <RefreshCw className="w-5 h-5 text-purple-600" />
               </button>
-              <button 
-                onClick={() => setShowSettings(!showSettings)}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  backdropFilter: 'blur(8px)',
-                  borderRadius: '12px',
-                  padding: '12px',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
-                }}
-                className="hover:scale-105 transition-transform"
-              >
-                <Settings className="w-5 h-5" style={{ color: '#8B5CF6' }} />
+              <button className="bg-white bg-opacity-90 backdrop-blur-lg rounded-xl p-3 shadow-md hover:scale-105 transition-transform">
+                <Settings className="w-5 h-5 text-purple-600" />
               </button>
             </div>
           </div>
@@ -369,151 +322,49 @@ const AmazonToolkitStore = () => {
       </header>
 
       <div className="container mx-auto px-6 py-8">
-        {/* Boutons d'ajout - 4 OPTIONS */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-6" style={{ color: '#7C3AED' }}>
-            ➕ Ajouter une application
-          </h2>
+          <h2 className="text-2xl font-bold mb-6 text-purple-700">➕ Ajouter une application</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Option 1 */}
-            <button
-              onClick={() => { setShowAddModal(true); setAddMode('simple'); }}
-              style={{
-                background: 'rgba(255, 255, 255, 0.7)',
-                backdropFilter: 'blur(16px)',
-                borderRadius: '24px',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.08)',
-                padding: '24px'
-              }}
-              className="text-left group hover:scale-105 transition-all"
-            >
-              <div style={{
-                background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
-                borderRadius: '16px',
-                width: '56px',
-                height: '56px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '16px',
-                boxShadow: '0 8px 24px rgba(139, 92, 246, 0.3)'
-              }}>
+            <button onClick={() => { setShowAddModal(true); setAddMode('simple'); }} className="bg-white bg-opacity-70 backdrop-blur-lg rounded-3xl border border-white border-opacity-20 shadow-xl p-6 text-left hover:scale-105 transition-all">
+              <div className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl w-14 h-14 flex items-center justify-center mb-4 shadow-lg">
                 <Code className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2" style={{ color: '#1F2937' }}>App Simple</h3>
-              <p className="text-sm" style={{ color: '#6B7280' }}>Code HTML</p>
+              <h3 className="text-lg font-bold mb-2 text-gray-800">App Simple</h3>
+              <p className="text-sm text-gray-600">Code HTML</p>
             </button>
 
-            {/* Option 2 */}
-            <button
-              onClick={() => { setShowAddModal(true); setAddMode('bolt'); }}
-              style={{
-                background: 'rgba(255, 255, 255, 0.7)',
-                backdropFilter: 'blur(16px)',
-                borderRadius: '24px',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.08)',
-                padding: '24px'
-              }}
-              className="text-left group hover:scale-105 transition-all"
-            >
-              <div style={{
-                background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
-                borderRadius: '16px',
-                width: '56px',
-                height: '56px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '16px',
-                boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)'
-              }}>
+            <button onClick={() => { setShowAddModal(true); setAddMode('bolt'); }} className="bg-white bg-opacity-70 backdrop-blur-lg rounded-3xl border border-white border-opacity-20 shadow-xl p-6 text-left hover:scale-105 transition-all">
+              <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl w-14 h-14 flex items-center justify-center mb-4 shadow-lg">
                 <Package className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2" style={{ color: '#1F2937' }}>App Bolt</h3>
-              <p className="text-sm" style={{ color: '#6B7280' }}>Upload fichiers</p>
+              <h3 className="text-lg font-bold mb-2 text-gray-800">App Bolt</h3>
+              <p className="text-sm text-gray-600">Upload fichiers</p>
             </button>
 
-            {/* Option 3 */}
-            <button
-              onClick={() => { setShowAddModal(true); setAddMode('github'); }}
-              style={{
-                background: 'rgba(255, 255, 255, 0.7)',
-                backdropFilter: 'blur(16px)',
-                borderRadius: '24px',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.08)',
-                padding: '24px'
-              }}
-              className="text-left group hover:scale-105 transition-all"
-            >
-              <div style={{
-                background: 'linear-gradient(135deg, #1F2937 0%, #111827 100%)',
-                borderRadius: '16px',
-                width: '56px',
-                height: '56px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '16px',
-                boxShadow: '0 8px 24px rgba(31, 41, 55, 0.3)'
-              }}>
+            <button onClick={() => { setShowAddModal(true); setAddMode('github'); }} className="bg-white bg-opacity-70 backdrop-blur-lg rounded-3xl border border-white border-opacity-20 shadow-xl p-6 text-left hover:scale-105 transition-all">
+              <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl w-14 h-14 flex items-center justify-center mb-4 shadow-lg">
                 <Github className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2" style={{ color: '#1F2937' }}>GitHub</h3>
-              <p className="text-sm" style={{ color: '#6B7280' }}>Deploy Vercel</p>
+              <h3 className="text-lg font-bold mb-2 text-gray-800">GitHub</h3>
+              <p className="text-sm text-gray-600">Deploy Vercel</p>
             </button>
 
-            {/* Option 4 */}
-            <button
-              onClick={() => { setShowAddModal(true); setAddMode('external'); }}
-              style={{
-                background: 'rgba(255, 255, 255, 0.7)',
-                backdropFilter: 'blur(16px)',
-                borderRadius: '24px',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.08)',
-                padding: '24px'
-              }}
-              className="text-left group hover:scale-105 transition-all"
-            >
-              <div style={{
-                background: 'linear-gradient(135deg, #EC4899 0%, #DB2777 100%)',
-                borderRadius: '16px',
-                width: '56px',
-                height: '56px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '16px',
-                boxShadow: '0 8px 24px rgba(236, 72, 153, 0.3)'
-              }}>
+            <button onClick={() => { setShowAddModal(true); setAddMode('external'); }} className="bg-white bg-opacity-70 backdrop-blur-lg rounded-3xl border border-white border-opacity-20 shadow-xl p-6 text-left hover:scale-105 transition-all">
+              <div className="bg-gradient-to-br from-pink-500 to-pink-700 rounded-2xl w-14 h-14 flex items-center justify-center mb-4 shadow-lg">
                 <Globe className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2" style={{ color: '#1F2937' }}>App Externe</h3>
-              <p className="text-sm" style={{ color: '#6B7280' }}>URL Azure/Vercel</p>
+              <h3 className="text-lg font-bold mb-2 text-gray-800">App Externe</h3>
+              <p className="text-sm text-gray-600">URL Azure/Vercel</p>
             </button>
           </div>
         </div>
 
-        {/* Modal */}
         {showAddModal && (
-          <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(8px)' }}>
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(24px)',
-              borderRadius: '32px',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: '0 30px 90px rgba(0, 0, 0, 0.2)',
-              maxWidth: '700px',
-              width: '100%',
-              maxHeight: '90vh',
-              overflow: 'auto'
-            }}>
+          <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black bg-opacity-40 backdrop-blur-sm">
+            <div className="bg-white bg-opacity-95 backdrop-blur-2xl rounded-3xl border border-white border-opacity-20 shadow-2xl max-w-2xl w-full max-h-90vh overflow-auto">
               <div className="p-8">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-3xl font-bold" style={{ color: '#7C3AED' }}>
+                  <h2 className="text-3xl font-bold text-purple-700">
                     {addMode === 'simple' && '📝 App Simple'}
                     {addMode === 'bolt' && '📦 App Bolt'}
                     {addMode === 'github' && '🔗 GitHub'}
@@ -522,55 +373,21 @@ const AmazonToolkitStore = () => {
                   <button onClick={closeModal} className="text-3xl text-gray-500 hover:text-gray-700">×</button>
                 </div>
 
-                {/* Formulaires selon le mode */}
                 {addMode === 'simple' && (
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block font-semibold mb-2">Nom *</label>
-                        <input
-                          type="text"
-                          value={simpleApp.name}
-                          onChange={(e) => setSimpleApp({...simpleApp, name: e.target.value})}
-                          style={{
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            border: '2px solid rgba(139, 92, 246, 0.2)',
-                            borderRadius: '12px',
-                            padding: '12px'
-                          }}
-                          className="w-full"
-                        />
+                        <input type="text" value={simpleApp.name} onChange={(e) => setSimpleApp({...simpleApp, name: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-purple-200 rounded-xl p-3" />
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div>
                           <label className="block font-semibold mb-2">Icône</label>
-                          <input
-                            type="text"
-                            value={boltApp.icon}
-                            onChange={(e) => setBoltApp({...boltApp, icon: e.target.value})}
-                            style={{
-                              background: 'rgba(255, 255, 255, 0.8)',
-                              borderRadius: '12px',
-                              padding: '12px',
-                              textAlign: 'center',
-                              fontSize: '24px'
-                            }}
-                            className="w-full"
-                          />
+                          <input type="text" value={simpleApp.icon} onChange={(e) => setSimpleApp({...simpleApp, icon: e.target.value})} className="w-full bg-white bg-opacity-80 rounded-xl p-3 text-center text-2xl" />
                         </div>
                         <div>
                           <label className="block font-semibold mb-2">Couleur</label>
-                          <select
-                            value={boltApp.color}
-                            onChange={(e) => setBoltApp({...boltApp, color: e.target.value})}
-                            style={{
-                              background: 'rgba(255, 255, 255, 0.8)',
-                              border: '2px solid rgba(59, 130, 246, 0.2)',
-                              borderRadius: '12px',
-                              padding: '12px'
-                            }}
-                            className="w-full"
-                          >
+                          <select value={simpleApp.color} onChange={(e) => setSimpleApp({...simpleApp, color: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-purple-200 rounded-xl p-3">
                             {Object.keys(colors).map(c => <option key={c} value={c}>{c}</option>)}
                           </select>
                         </div>
@@ -578,137 +395,90 @@ const AmazonToolkitStore = () => {
                     </div>
                     <div>
                       <label className="block font-semibold mb-2">Description</label>
-                      <input
-                        type="text"
-                        value={boltApp.description}
-                        onChange={(e) => setBoltApp({...boltApp, description: e.target.value})}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.8)',
-                          border: '2px solid rgba(59, 130, 246, 0.2)',
-                          borderRadius: '12px',
-                          padding: '12px'
-                        }}
-                        className="w-full"
-                      />
+                      <input type="text" value={simpleApp.description} onChange={(e) => setSimpleApp({...simpleApp, description: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-purple-200 rounded-xl p-3" />
+                    </div>
+                    <div>
+                      <label className="block font-semibold mb-2">Code HTML *</label>
+                      <textarea value={simpleApp.htmlContent} onChange={(e) => setSimpleApp({...simpleApp, htmlContent: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-purple-200 rounded-xl p-3 font-mono" rows="10"></textarea>
+                    </div>
+                    {uploadProgress > 0 && (
+                      <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div className="bg-gradient-to-r from-purple-500 to-purple-700 h-full rounded-full transition-all" style={{ width: `${uploadProgress}%` }}></div>
+                      </div>
+                    )}
+                    <div className="flex gap-3">
+                      <button onClick={addSimpleApp} className="flex-1 bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-2xl py-4 px-8 font-bold shadow-lg hover:scale-105 transition-transform">✅ Ajouter</button>
+                      <button onClick={closeModal} className="bg-gray-200 rounded-2xl py-4 px-8 font-bold hover:bg-gray-300">Annuler</button>
+                    </div>
+                  </div>
+                )}
+
+                {addMode === 'bolt' && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block font-semibold mb-2">Nom *</label>
+                        <input type="text" value={boltApp.name} onChange={(e) => setBoltApp({...boltApp, name: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-blue-200 rounded-xl p-3" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block font-semibold mb-2">Icône</label>
+                          <input type="text" value={boltApp.icon} onChange={(e) => setBoltApp({...boltApp, icon: e.target.value})} className="w-full bg-white bg-opacity-80 rounded-xl p-3 text-center text-2xl" />
+                        </div>
+                        <div>
+                          <label className="block font-semibold mb-2">Couleur</label>
+                          <select value={boltApp.color} onChange={(e) => setBoltApp({...boltApp, color: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-blue-200 rounded-xl p-3">
+                            {Object.keys(colors).map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block font-semibold mb-2">Description</label>
+                      <input type="text" value={boltApp.description} onChange={(e) => setBoltApp({...boltApp, description: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-blue-200 rounded-xl p-3" />
                     </div>
                     <div>
                       <label className="block font-semibold mb-2">Fichiers *</label>
-                      <div style={{
-                        border: '2px dashed rgba(59, 130, 246, 0.3)',
-                        borderRadius: '16px',
-                        padding: '32px',
-                        textAlign: 'center',
-                        background: 'rgba(219, 234, 254, 0.3)'
-                      }}>
-                        <input
-                          type="file"
-                          multiple
-                          onChange={handleFileSelect}
-                          className="hidden"
-                          id="file-upload-bolt"
-                        />
+                      <div className="border-2 border-dashed border-blue-300 rounded-2xl p-8 text-center bg-blue-50 bg-opacity-30">
+                        <input type="file" multiple onChange={handleFileSelect} className="hidden" id="file-upload-bolt" />
                         <label htmlFor="file-upload-bolt" className="cursor-pointer">
                           <Upload className="w-12 h-12 mx-auto mb-3 text-blue-500" />
                           <p className="font-semibold text-gray-700">Sélectionner fichiers</p>
                           <p className="text-sm text-gray-500 mt-2">/dist/ ou /build/</p>
                         </label>
-                        {boltApp.files.length > 0 && (
-                          <p className="mt-3 font-bold text-green-600">{boltApp.files.length} fichiers</p>
-                        )}
+                        {boltApp.files.length > 0 && <p className="mt-3 font-bold text-green-600">{boltApp.files.length} fichiers</p>}
                       </div>
                     </div>
                     {uploadProgress > 0 && (
                       <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div style={{
-                          background: 'linear-gradient(90deg, #3B82F6, #2563EB)',
-                          width: `${uploadProgress}%`,
-                          height: '100%',
-                          borderRadius: '9999px',
-                          transition: 'width 0.3s'
-                        }}></div>
+                        <div className="bg-gradient-to-r from-blue-500 to-blue-700 h-full rounded-full transition-all" style={{ width: `${uploadProgress}%` }}></div>
                       </div>
                     )}
                     <div className="flex gap-3">
-                      <button 
-                        onClick={addBoltApp}
-                        style={{
-                          background: 'linear-gradient(135deg, #3B82F6, #2563EB)',
-                          color: 'white',
-                          borderRadius: '16px',
-                          padding: '16px 32px',
-                          fontWeight: 'bold',
-                          boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)'
-                        }}
-                        className="flex-1 hover:scale-105 transition-transform"
-                      >
-                        ✅ Uploader
-                      </button>
-                      <button 
-                        onClick={closeModal}
-                        style={{
-                          background: 'rgba(156, 163, 175, 0.2)',
-                          borderRadius: '16px',
-                          padding: '16px 32px',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        Annuler
-                      </button>
+                      <button onClick={addBoltApp} className="flex-1 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-2xl py-4 px-8 font-bold shadow-lg hover:scale-105 transition-transform">✅ Uploader</button>
+                      <button onClick={closeModal} className="bg-gray-200 rounded-2xl py-4 px-8 font-bold hover:bg-gray-300">Annuler</button>
                     </div>
                   </div>
                 )}
 
                 {addMode === 'github' && (
                   <div className="space-y-4">
-                    <div className="p-4 rounded-lg" style={{ background: 'rgba(251, 191, 36, 0.1)', border: '2px solid rgba(251, 191, 36, 0.3)' }}>
+                    <div className="p-4 rounded-lg bg-yellow-50 bg-opacity-50 border-2 border-yellow-300">
                       <p className="text-sm text-yellow-800">⚠️ Token Vercel requis dans le code</p>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block font-semibold mb-2">Nom *</label>
-                        <input
-                          type="text"
-                          value={githubApp.name}
-                          onChange={(e) => setGithubApp({...githubApp, name: e.target.value})}
-                          style={{
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            border: '2px solid rgba(31, 41, 55, 0.2)',
-                            borderRadius: '12px',
-                            padding: '12px'
-                          }}
-                          className="w-full"
-                        />
+                        <input type="text" value={githubApp.name} onChange={(e) => setGithubApp({...githubApp, name: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-gray-200 rounded-xl p-3" />
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div>
                           <label className="block font-semibold mb-2">Icône</label>
-                          <input
-                            type="text"
-                            value={githubApp.icon}
-                            onChange={(e) => setGithubApp({...githubApp, icon: e.target.value})}
-                            style={{
-                              background: 'rgba(255, 255, 255, 0.8)',
-                              borderRadius: '12px',
-                              padding: '12px',
-                              textAlign: 'center',
-                              fontSize: '24px'
-                            }}
-                            className="w-full"
-                          />
+                          <input type="text" value={githubApp.icon} onChange={(e) => setGithubApp({...githubApp, icon: e.target.value})} className="w-full bg-white bg-opacity-80 rounded-xl p-3 text-center text-2xl" />
                         </div>
                         <div>
                           <label className="block font-semibold mb-2">Couleur</label>
-                          <select
-                            value={githubApp.color}
-                            onChange={(e) => setGithubApp({...githubApp, color: e.target.value})}
-                            style={{
-                              background: 'rgba(255, 255, 255, 0.8)',
-                              border: '2px solid rgba(31, 41, 55, 0.2)',
-                              borderRadius: '12px',
-                              padding: '12px'
-                            }}
-                            className="w-full"
-                          >
+                          <select value={githubApp.color} onChange={(e) => setGithubApp({...githubApp, color: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-gray-200 rounded-xl p-3">
                             {Object.keys(colors).map(c => <option key={c} value={c}>{c}</option>)}
                           </select>
                         </div>
@@ -716,118 +486,39 @@ const AmazonToolkitStore = () => {
                     </div>
                     <div>
                       <label className="block font-semibold mb-2">Description</label>
-                      <input
-                        type="text"
-                        value={githubApp.description}
-                        onChange={(e) => setGithubApp({...githubApp, description: e.target.value})}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.8)',
-                          border: '2px solid rgba(31, 41, 55, 0.2)',
-                          borderRadius: '12px',
-                          padding: '12px'
-                        }}
-                        className="w-full"
-                      />
+                      <input type="text" value={githubApp.description} onChange={(e) => setGithubApp({...githubApp, description: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-gray-200 rounded-xl p-3" />
                     </div>
                     <div>
                       <label className="block font-semibold mb-2">URL GitHub *</label>
-                      <input
-                        type="text"
-                        value={githubApp.repoUrl}
-                        onChange={(e) => setGithubApp({...githubApp, repoUrl: e.target.value})}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.8)',
-                          border: '2px solid rgba(31, 41, 55, 0.2)',
-                          borderRadius: '12px',
-                          padding: '12px'
-                        }}
-                        className="w-full"
-                        placeholder="https://github.com/username/repo"
-                      />
+                      <input type="text" value={githubApp.repoUrl} onChange={(e) => setGithubApp({...githubApp, repoUrl: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-gray-200 rounded-xl p-3" placeholder="https://github.com/username/repo" />
                     </div>
                     <div className="flex gap-3">
-                      <button 
-                        onClick={deployFromGithub}
-                        disabled={githubApp.deploying}
-                        style={{
-                          background: 'linear-gradient(135deg, #1F2937, #111827)',
-                          color: 'white',
-                          borderRadius: '16px',
-                          padding: '16px 32px',
-                          fontWeight: 'bold',
-                          boxShadow: '0 8px 24px rgba(31, 41, 55, 0.4)'
-                        }}
-                        className="flex-1 hover:scale-105 transition-transform disabled:opacity-50"
-                      >
+                      <button onClick={deployFromGithub} disabled={githubApp.deploying} className="flex-1 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-2xl py-4 px-8 font-bold shadow-lg hover:scale-105 transition-transform disabled:opacity-50">
                         {githubApp.deploying ? '⏳ Déploiement...' : '🚀 Déployer'}
                       </button>
-                      <button 
-                        onClick={closeModal}
-                        style={{
-                          background: 'rgba(156, 163, 175, 0.2)',
-                          borderRadius: '16px',
-                          padding: '16px 32px',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        Annuler
-                      </button>
+                      <button onClick={closeModal} className="bg-gray-200 rounded-2xl py-4 px-8 font-bold hover:bg-gray-300">Annuler</button>
                     </div>
                   </div>
                 )}
 
                 {addMode === 'external' && (
                   <div className="space-y-4">
-                    <div className="p-4 rounded-lg" style={{ background: 'rgba(236, 72, 153, 0.1)', border: '2px solid rgba(236, 72, 153, 0.3)' }}>
+                    <div className="p-4 rounded-lg bg-pink-50 bg-opacity-50 border-2 border-pink-300">
                       <p className="text-sm text-pink-800">🌐 Ajoutez une app hébergée ailleurs (Azure, Vercel, Netlify...)</p>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block font-semibold mb-2">Nom *</label>
-                        <input
-                          type="text"
-                          value={externalApp.name}
-                          onChange={(e) => setExternalApp({...externalApp, name: e.target.value})}
-                          style={{
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            border: '2px solid rgba(236, 72, 153, 0.2)',
-                            borderRadius: '12px',
-                            padding: '12px'
-                          }}
-                          className="w-full"
-                          placeholder="Mon App Azure"
-                        />
+                        <input type="text" value={externalApp.name} onChange={(e) => setExternalApp({...externalApp, name: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-pink-200 rounded-xl p-3" placeholder="Mon App Azure" />
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div>
                           <label className="block font-semibold mb-2">Icône</label>
-                          <input
-                            type="text"
-                            value={externalApp.icon}
-                            onChange={(e) => setExternalApp({...externalApp, icon: e.target.value})}
-                            style={{
-                              background: 'rgba(255, 255, 255, 0.8)',
-                              borderRadius: '12px',
-                              padding: '12px',
-                              textAlign: 'center',
-                              fontSize: '24px'
-                            }}
-                            className="w-full"
-                          />
+                          <input type="text" value={externalApp.icon} onChange={(e) => setExternalApp({...externalApp, icon: e.target.value})} className="w-full bg-white bg-opacity-80 rounded-xl p-3 text-center text-2xl" />
                         </div>
                         <div>
                           <label className="block font-semibold mb-2">Couleur</label>
-                          <select
-                            value={externalApp.color}
-                            onChange={(e) => setExternalApp({...externalApp, color: e.target.value})}
-                            style={{
-                              background: 'rgba(255, 255, 255, 0.8)',
-                              border: '2px solid rgba(236, 72, 153, 0.2)',
-                              borderRadius: '12px',
-                              padding: '12px'
-                            }}
-                            className="w-full"
-                          >
+                          <select value={externalApp.color} onChange={(e) => setExternalApp({...externalApp, color: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-pink-200 rounded-xl p-3">
                             {Object.keys(colors).map(c => <option key={c} value={c}>{c}</option>)}
                           </select>
                         </div>
@@ -835,63 +526,16 @@ const AmazonToolkitStore = () => {
                     </div>
                     <div>
                       <label className="block font-semibold mb-2">Description</label>
-                      <input
-                        type="text"
-                        value={externalApp.description}
-                        onChange={(e) => setExternalApp({...externalApp, description: e.target.value})}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.8)',
-                          border: '2px solid rgba(236, 72, 153, 0.2)',
-                          borderRadius: '12px',
-                          padding: '12px'
-                        }}
-                        className="w-full"
-                        placeholder="Mon application hébergée sur Azure"
-                      />
+                      <input type="text" value={externalApp.description} onChange={(e) => setExternalApp({...externalApp, description: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-pink-200 rounded-xl p-3" placeholder="Mon application hébergée sur Azure" />
                     </div>
                     <div>
                       <label className="block font-semibold mb-2">URL Complète *</label>
-                      <input
-                        type="url"
-                        value={externalApp.externalUrl}
-                        onChange={(e) => setExternalApp({...externalApp, externalUrl: e.target.value})}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.8)',
-                          border: '2px solid rgba(236, 72, 153, 0.2)',
-                          borderRadius: '12px',
-                          padding: '12px'
-                        }}
-                        className="w-full"
-                        placeholder="https://mon-app.azurestaticapps.net"
-                      />
+                      <input type="url" value={externalApp.externalUrl} onChange={(e) => setExternalApp({...externalApp, externalUrl: e.target.value})} className="w-full bg-white bg-opacity-80 border-2 border-pink-200 rounded-xl p-3" placeholder="https://mon-app.azurestaticapps.net" />
                       <p className="text-xs mt-2 text-gray-600">Exemples: Azure, Vercel, Netlify, votre domaine...</p>
                     </div>
                     <div className="flex gap-3">
-                      <button 
-                        onClick={addExternalApp}
-                        style={{
-                          background: 'linear-gradient(135deg, #EC4899, #DB2777)',
-                          color: 'white',
-                          borderRadius: '16px',
-                          padding: '16px 32px',
-                          fontWeight: 'bold',
-                          boxShadow: '0 8px 24px rgba(236, 72, 153, 0.4)'
-                        }}
-                        className="flex-1 hover:scale-105 transition-transform"
-                      >
-                        ✅ Ajouter
-                      </button>
-                      <button 
-                        onClick={closeModal}
-                        style={{
-                          background: 'rgba(156, 163, 175, 0.2)',
-                          borderRadius: '16px',
-                          padding: '16px 32px',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        Annuler
-                      </button>
+                      <button onClick={addExternalApp} className="flex-1 bg-gradient-to-r from-pink-500 to-pink-700 text-white rounded-2xl py-4 px-8 font-bold shadow-lg hover:scale-105 transition-transform">✅ Ajouter</button>
+                      <button onClick={closeModal} className="bg-gray-200 rounded-2xl py-4 px-8 font-bold hover:bg-gray-300">Annuler</button>
                     </div>
                   </div>
                 )}
@@ -900,55 +544,27 @@ const AmazonToolkitStore = () => {
           </div>
         )}
 
-        {/* Liste des apps */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-purple-500" style={{ borderTopColor: 'transparent' }}></div>
-            <p className="mt-4 font-semibold" style={{ color: '#7C3AED' }}>Chargement...</p>
+            <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-purple-500 border-t-transparent"></div>
+            <p className="mt-4 font-semibold text-purple-700">Chargement...</p>
           </div>
         ) : apps.length === 0 ? (
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.7)',
-            backdropFilter: 'blur(16px)',
-            borderRadius: '24px',
-            padding: '48px',
-            textAlign: 'center',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.08)'
-          }}>
-            <p className="text-2xl font-bold" style={{ color: '#7C3AED' }}>Aucune application</p>
-            <p className="mt-2" style={{ color: '#6B7280' }}>Ajoutez votre première app ! ☝️</p>
+          <div className="bg-white bg-opacity-70 backdrop-blur-lg rounded-3xl p-12 text-center shadow-xl">
+            <p className="text-2xl font-bold text-purple-700">Aucune application</p>
+            <p className="mt-2 text-gray-600">Ajoutez votre première app ! ☝️</p>
           </div>
         ) : (
           <div>
-            <h2 className="text-3xl font-bold mb-6" style={{ color: '#7C3AED' }}>
-              📱 Mes Applications ({apps.length})
-            </h2>
+            <h2 className="text-3xl font-bold mb-6 text-purple-700">📱 Mes Applications ({apps.length})</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {apps.map((app) => (
-                <div
-                  key={app.id}
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.7)',
-                    backdropFilter: 'blur(16px)',
-                    borderRadius: '24px',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.08)',
-                    overflow: 'hidden'
-                  }}
-                  className="hover:scale-105 transition-all"
-                >
+                <div key={app.id} className="bg-white bg-opacity-70 backdrop-blur-lg rounded-3xl border border-white border-opacity-20 shadow-xl overflow-hidden hover:scale-105 transition-all">
                   <div className={`bg-gradient-to-br ${colors[app.color] || colors.purple} p-6`}>
                     <div className="text-5xl mb-3">{app.icon}</div>
                     <h3 className="text-xl font-bold text-white mb-2">{app.name}</h3>
                     {app.app_type && (
-                      <span style={{
-                        background: 'rgba(255, 255, 255, 0.3)',
-                        padding: '4px 12px',
-                        borderRadius: '12px',
-                        fontSize: '11px',
-                        fontWeight: 'bold',
-                        color: 'white'
-                      }}>
+                      <span className="bg-white bg-opacity-30 px-3 py-1 rounded-xl text-xs font-bold text-white">
                         {app.app_type === 'html' && '📝 HTML'}
                         {app.app_type === 'react' && '⚛️ React'}
                         {app.app_type === 'vercel' && '▲ Vercel'}
@@ -957,36 +573,12 @@ const AmazonToolkitStore = () => {
                     )}
                   </div>
                   <div className="p-6">
-                    <p className="text-sm mb-4 h-12" style={{ color: '#6B7280' }}>{app.description}</p>
+                    <p className="text-sm mb-4 h-12 text-gray-600">{app.description}</p>
                     <div className="flex gap-2">
-                      <a
-                        href={app.vercel_url || `${SUPABASE_URL}/storage/v1/object/public/${app.storage_path}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
-                          color: 'white',
-                          padding: '12px 24px',
-                          borderRadius: '12px',
-                          fontWeight: 'bold',
-                          textAlign: 'center',
-                          boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
-                        }}
-                        className="flex-1 hover:scale-105 transition-transform"
-                      >
+                      <a href={app.vercel_url || `${SUPABASE_URL}/storage/v1/object/public/${app.storage_path}`} target="_blank" rel="noopener noreferrer" className="flex-1 bg-gradient-to-r from-purple-500 to-purple-700 text-white py-3 px-6 rounded-xl font-bold text-center shadow-md hover:scale-105 transition-transform">
                         Ouvrir
                       </a>
-                      <button
-                        onClick={() => deleteApp(app.id)}
-                        style={{
-                          background: 'linear-gradient(135deg, #EF4444, #DC2626)',
-                          color: 'white',
-                          padding: '12px',
-                          borderRadius: '12px',
-                          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
-                        }}
-                        className="hover:scale-105 transition-transform"
-                      >
+                      <button onClick={() => deleteApp(app.id)} className="bg-gradient-to-r from-red-500 to-red-700 text-white p-3 rounded-xl shadow-md hover:scale-105 transition-transform">
                         <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
@@ -998,17 +590,10 @@ const AmazonToolkitStore = () => {
         )}
       </div>
 
-      {/* Footer */}
-      <footer style={{
-        background: 'rgba(255, 255, 255, 0.5)',
-        backdropFilter: 'blur(16px)',
-        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-        marginTop: '64px',
-        padding: '24px'
-      }}>
+      <footer className="bg-white bg-opacity-50 backdrop-blur-lg border-t border-white border-opacity-20 mt-16 py-6">
         <div className="container mx-auto px-4 text-center">
-          <p style={{ color: '#7C3AED', fontWeight: 'bold' }}>{storeName} © 2025</p>
-          <p className="text-sm mt-1" style={{ color: '#6B7280' }}>Powered by Supabase + GitHub + Vercel</p>
+          <p className="text-purple-700 font-bold">{storeName} © 2025</p>
+          <p className="text-sm mt-1 text-gray-600">Powered by Supabase + GitHub + Vercel</p>
         </div>
       </footer>
     </div>
@@ -1016,129 +601,3 @@ const AmazonToolkitStore = () => {
 };
 
 export default AmazonToolkitStore;
-                            value={simpleApp.icon}
-                            onChange={(e) => setSimpleApp({...simpleApp, icon: e.target.value})}
-                            style={{
-                              background: 'rgba(255, 255, 255, 0.8)',
-                              borderRadius: '12px',
-                              padding: '12px',
-                              textAlign: 'center',
-                              fontSize: '24px'
-                            }}
-                            className="w-full"
-                          />
-                        </div>
-                        <div>
-                          <label className="block font-semibold mb-2">Couleur</label>
-                          <select
-                            value={simpleApp.color}
-                            onChange={(e) => setSimpleApp({...simpleApp, color: e.target.value})}
-                            style={{
-                              background: 'rgba(255, 255, 255, 0.8)',
-                              border: '2px solid rgba(139, 92, 246, 0.2)',
-                              borderRadius: '12px',
-                              padding: '12px'
-                            }}
-                            className="w-full"
-                          >
-                            {Object.keys(colors).map(c => <option key={c} value={c}>{c}</option>)}
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block font-semibold mb-2">Description</label>
-                      <input
-                        type="text"
-                        value={simpleApp.description}
-                        onChange={(e) => setSimpleApp({...simpleApp, description: e.target.value})}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.8)',
-                          border: '2px solid rgba(139, 92, 246, 0.2)',
-                          borderRadius: '12px',
-                          padding: '12px'
-                        }}
-                        className="w-full"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-semibold mb-2">Code HTML *</label>
-                      <textarea
-                        value={simpleApp.htmlContent}
-                        onChange={(e) => setSimpleApp({...simpleApp, htmlContent: e.target.value})}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.8)',
-                          border: '2px solid rgba(139, 92, 246, 0.2)',
-                          borderRadius: '12px',
-                          padding: '12px',
-                          fontFamily: 'monospace'
-                        }}
-                        className="w-full"
-                        rows="10"
-                      />
-                    </div>
-                    {uploadProgress > 0 && (
-                      <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div style={{
-                          background: 'linear-gradient(90deg, #8B5CF6, #7C3AED)',
-                          width: `${uploadProgress}%`,
-                          height: '100%',
-                          borderRadius: '9999px',
-                          transition: 'width 0.3s'
-                        }}></div>
-                      </div>
-                    )}
-                    <div className="flex gap-3">
-                      <button 
-                        onClick={addSimpleApp}
-                        style={{
-                          background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
-                          color: 'white',
-                          borderRadius: '16px',
-                          padding: '16px 32px',
-                          fontWeight: 'bold',
-                          boxShadow: '0 8px 24px rgba(139, 92, 246, 0.4)'
-                        }}
-                        className="flex-1 hover:scale-105 transition-transform"
-                      >
-                        ✅ Ajouter
-                      </button>
-                      <button 
-                        onClick={closeModal}
-                        style={{
-                          background: 'rgba(156, 163, 175, 0.2)',
-                          borderRadius: '16px',
-                          padding: '16px 32px',
-                          fontWeight: 'bold'
-                        }}
-                        className="hover:bg-gray-300"
-                      >
-                        Annuler
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {addMode === 'bolt' && (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block font-semibold mb-2">Nom *</label>
-                        <input
-                          type="text"
-                          value={boltApp.name}
-                          onChange={(e) => setBoltApp({...boltApp, name: e.target.value})}
-                          style={{
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            border: '2px solid rgba(59, 130, 246, 0.2)',
-                            borderRadius: '12px',
-                            padding: '12px'
-                          }}
-                          className="w-full"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block font-semibold mb-2">Icône</label>
-                          <input
-                            type="text"
