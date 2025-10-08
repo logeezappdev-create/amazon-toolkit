@@ -46,15 +46,9 @@ const AmazonToolkitStore = () => {
     rose: 'from-rose-400 to-rose-600'
   };
 
-  // Charger le nom du magasin depuis localStorage UNIQUEMENT côté client
+  // Charger le nom du magasin depuis state UNIQUEMENT (pas de localStorage)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedName = localStorage.getItem('storeName');
-      if (savedName) {
-        setStoreName(savedName);
-        setTempName(savedName);
-      }
-    }
+    // Nom par défaut déjà initialisé dans useState
   }, []);
 
   const supabaseFetch = async (endpoint, options = {}) => {
@@ -280,10 +274,6 @@ const AmazonToolkitStore = () => {
 
   const saveStoreName = () => {
     setStoreName(tempName);
-    // Sauvegarder seulement côté client
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('storeName', tempName);
-    }
     setEditingName(false);
   };
 
@@ -557,132 +547,6 @@ const AmazonToolkitStore = () => {
                           <label className="block font-semibold mb-2">Icône</label>
                           <input
                             type="text"
-                            value={simpleApp.icon}
-                            onChange={(e) => setSimpleApp({...simpleApp, icon: e.target.value})}
-                            style={{
-                              background: 'rgba(255, 255, 255, 0.8)',
-                              borderRadius: '12px',
-                              padding: '12px',
-                              textAlign: 'center',
-                              fontSize: '24px'
-                            }}
-                            className="w-full"
-                          />
-                        </div>
-                        <div>
-                          <label className="block font-semibold mb-2">Couleur</label>
-                          <select
-                            value={simpleApp.color}
-                            onChange={(e) => setSimpleApp({...simpleApp, color: e.target.value})}
-                            style={{
-                              background: 'rgba(255, 255, 255, 0.8)',
-                              border: '2px solid rgba(139, 92, 246, 0.2)',
-                              borderRadius: '12px',
-                              padding: '12px'
-                            }}
-                            className="w-full"
-                          >
-                            {Object.keys(colors).map(c => <option key={c} value={c}>{c}</option>)}
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block font-semibold mb-2">Description</label>
-                      <input
-                        type="text"
-                        value={simpleApp.description}
-                        onChange={(e) => setSimpleApp({...simpleApp, description: e.target.value})}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.8)',
-                          border: '2px solid rgba(139, 92, 246, 0.2)',
-                          borderRadius: '12px',
-                          padding: '12px'
-                        }}
-                        className="w-full"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-semibold mb-2">Code HTML *</label>
-                      <textarea
-                        value={simpleApp.htmlContent}
-                        onChange={(e) => setSimpleApp({...simpleApp, htmlContent: e.target.value})}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.8)',
-                          border: '2px solid rgba(139, 92, 246, 0.2)',
-                          borderRadius: '12px',
-                          padding: '12px',
-                          fontFamily: 'monospace'
-                        }}
-                        className="w-full"
-                        rows="10"
-                      />
-                    </div>
-                    {uploadProgress > 0 && (
-                      <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div style={{
-                          background: 'linear-gradient(90deg, #8B5CF6, #7C3AED)',
-                          width: `${uploadProgress}%`,
-                          height: '100%',
-                          borderRadius: '9999px',
-                          transition: 'width 0.3s'
-                        }}></div>
-                      </div>
-                    )}
-                    <div className="flex gap-3">
-                      <button 
-                        onClick={addSimpleApp}
-                        style={{
-                          background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
-                          color: 'white',
-                          borderRadius: '16px',
-                          padding: '16px 32px',
-                          fontWeight: 'bold',
-                          boxShadow: '0 8px 24px rgba(139, 92, 246, 0.4)'
-                        }}
-                        className="flex-1 hover:scale-105 transition-transform"
-                      >
-                        ✅ Ajouter
-                      </button>
-                      <button 
-                        onClick={closeModal}
-                        style={{
-                          background: 'rgba(156, 163, 175, 0.2)',
-                          borderRadius: '16px',
-                          padding: '16px 32px',
-                          fontWeight: 'bold'
-                        }}
-                        className="hover:bg-gray-300"
-                      >
-                        Annuler
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {addMode === 'bolt' && (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block font-semibold mb-2">Nom *</label>
-                        <input
-                          type="text"
-                          value={boltApp.name}
-                          onChange={(e) => setBoltApp({...boltApp, name: e.target.value})}
-                          style={{
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            border: '2px solid rgba(59, 130, 246, 0.2)',
-                            borderRadius: '12px',
-                            padding: '12px'
-                          }}
-                          className="w-full"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block font-semibold mb-2">Icône</label>
-                          <input
-                            type="text"
                             value={boltApp.icon}
                             onChange={(e) => setBoltApp({...boltApp, icon: e.target.value})}
                             style={{
@@ -740,15 +604,13 @@ const AmazonToolkitStore = () => {
                         <input
                           type="file"
                           multiple
-                          webkitdirectory="true"
-                          directory="true"
                           onChange={handleFileSelect}
                           className="hidden"
                           id="file-upload-bolt"
                         />
                         <label htmlFor="file-upload-bolt" className="cursor-pointer">
                           <Upload className="w-12 h-12 mx-auto mb-3 text-blue-500" />
-                          <p className="font-semibold text-gray-700">Sélectionner dossier</p>
+                          <p className="font-semibold text-gray-700">Sélectionner fichiers</p>
                           <p className="text-sm text-gray-500 mt-2">/dist/ ou /build/</p>
                         </label>
                         {boltApp.files.length > 0 && (
@@ -1076,10 +938,7 @@ const AmazonToolkitStore = () => {
                   }}
                   className="hover:scale-105 transition-all"
                 >
-                  <div style={{
-                    background: `linear-gradient(135deg, ${colors[app.color]?.split(' ')[0].replace('from-', '')} 0%, ${colors[app.color]?.split(' ')[2].replace('to-', '')} 100%)`,
-                    padding: '24px'
-                  }}>
+                  <div className={`bg-gradient-to-br ${colors[app.color] || colors.purple} p-6`}>
                     <div className="text-5xl mb-3">{app.icon}</div>
                     <h3 className="text-xl font-bold text-white mb-2">{app.name}</h3>
                     {app.app_type && (
@@ -1157,4 +1016,130 @@ const AmazonToolkitStore = () => {
   );
 };
 
-export default AmazonToolkitStore;
+export default AmazonToolkitStore;Icône</label>
+                          <input
+                            type="text"
+                            value={simpleApp.icon}
+                            onChange={(e) => setSimpleApp({...simpleApp, icon: e.target.value})}
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.8)',
+                              borderRadius: '12px',
+                              padding: '12px',
+                              textAlign: 'center',
+                              fontSize: '24px'
+                            }}
+                            className="w-full"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-semibold mb-2">Couleur</label>
+                          <select
+                            value={simpleApp.color}
+                            onChange={(e) => setSimpleApp({...simpleApp, color: e.target.value})}
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.8)',
+                              border: '2px solid rgba(139, 92, 246, 0.2)',
+                              borderRadius: '12px',
+                              padding: '12px'
+                            }}
+                            className="w-full"
+                          >
+                            {Object.keys(colors).map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block font-semibold mb-2">Description</label>
+                      <input
+                        type="text"
+                        value={simpleApp.description}
+                        onChange={(e) => setSimpleApp({...simpleApp, description: e.target.value})}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.8)',
+                          border: '2px solid rgba(139, 92, 246, 0.2)',
+                          borderRadius: '12px',
+                          padding: '12px'
+                        }}
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold mb-2">Code HTML *</label>
+                      <textarea
+                        value={simpleApp.htmlContent}
+                        onChange={(e) => setSimpleApp({...simpleApp, htmlContent: e.target.value})}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.8)',
+                          border: '2px solid rgba(139, 92, 246, 0.2)',
+                          borderRadius: '12px',
+                          padding: '12px',
+                          fontFamily: 'monospace'
+                        }}
+                        className="w-full"
+                        rows="10"
+                      />
+                    </div>
+                    {uploadProgress > 0 && (
+                      <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div style={{
+                          background: 'linear-gradient(90deg, #8B5CF6, #7C3AED)',
+                          width: `${uploadProgress}%`,
+                          height: '100%',
+                          borderRadius: '9999px',
+                          transition: 'width 0.3s'
+                        }}></div>
+                      </div>
+                    )}
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={addSimpleApp}
+                        style={{
+                          background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
+                          color: 'white',
+                          borderRadius: '16px',
+                          padding: '16px 32px',
+                          fontWeight: 'bold',
+                          boxShadow: '0 8px 24px rgba(139, 92, 246, 0.4)'
+                        }}
+                        className="flex-1 hover:scale-105 transition-transform"
+                      >
+                        ✅ Ajouter
+                      </button>
+                      <button 
+                        onClick={closeModal}
+                        style={{
+                          background: 'rgba(156, 163, 175, 0.2)',
+                          borderRadius: '16px',
+                          padding: '16px 32px',
+                          fontWeight: 'bold'
+                        }}
+                        className="hover:bg-gray-300"
+                      >
+                        Annuler
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {addMode === 'bolt' && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block font-semibold mb-2">Nom *</label>
+                        <input
+                          type="text"
+                          value={boltApp.name}
+                          onChange={(e) => setBoltApp({...boltApp, name: e.target.value})}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.8)',
+                            border: '2px solid rgba(59, 130, 246, 0.2)',
+                            borderRadius: '12px',
+                            padding: '12px'
+                          }}
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block font-semibold mb-2">
