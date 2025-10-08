@@ -7,7 +7,6 @@ import {
   Code,
   Package,
   Github,
-  Globe,
   Settings,
   Edit2,
   Check,
@@ -17,7 +16,6 @@ import {
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-// ⚠️ VERCEL_TOKEN n'est PAS ici → il est dans l'API route
 
 const AmazonToolkitStore = () => {
   const [apps, setApps] = useState([]);
@@ -290,7 +288,6 @@ const AmazonToolkitStore = () => {
     <div className="min-h-screen" style={{
       background: 'linear-gradient(135deg, #F3E8FF 0%, #DBEAFE 50%, #FCE7F3 100%)'
     }}>
-      {/* Header */}
       <header style={{
         background: 'rgba(255, 255, 255, 0.7)',
         backdropFilter: 'blur(16px)',
@@ -374,7 +371,6 @@ const AmazonToolkitStore = () => {
       </header>
 
       <div className="container mx-auto px-6 py-8">
-        {/* Boutons d'ajout */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-6" style={{ color: '#7C3AED' }}>
             ➕ Ajouter une application
@@ -498,7 +494,6 @@ const AmazonToolkitStore = () => {
           </div>
         </div>
 
-        {/* Modal */}
         {showAddModal && (
           <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(8px)' }}>
             <div style={{
@@ -1028,7 +1023,6 @@ const AmazonToolkitStore = () => {
           </div>
         )}
 
-        {/* Liste des apps */}
         {loading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-purple-500" style={{ borderTopColor: 'transparent' }}></div>
