@@ -46,9 +46,8 @@ const AmazonToolkitStore = () => {
     rose: 'from-rose-400 to-rose-600'
   };
 
-  // Charger le nom du magasin depuis state UNIQUEMENT (pas de localStorage)
   useEffect(() => {
-    // Nom par défaut déjà initialisé dans useState
+    // Nom par défaut déjà initialisé
   }, []);
 
   const supabaseFetch = async (endpoint, options = {}) => {
@@ -192,7 +191,7 @@ const AmazonToolkitStore = () => {
     }
     try {
       setGithubApp({...githubApp, deploying: true});
-      const match = githubApp.repoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+      const match = githubApp.repoUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
       if (!match) throw new Error('URL invalide');
       const [, owner, repo] = match;
       const vercelResponse = await fetch('https://api.vercel.com/v10/projects', {
@@ -1016,9 +1015,7 @@ const AmazonToolkitStore = () => {
   );
 };
 
-export default AmazonToolkitStore;Icône</label>
-                          <input
-                            type="text"
+export default AmazonToolkitStore;
                             value={simpleApp.icon}
                             onChange={(e) => setSimpleApp({...simpleApp, icon: e.target.value})}
                             style={{
@@ -1142,4 +1139,6 @@ export default AmazonToolkitStore;Icône</label>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <label className="block font-semibold mb-2">
+                          <label className="block font-semibold mb-2">Icône</label>
+                          <input
+                            type="text"
